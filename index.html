@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Advanced Quiz</title>
+  <style>
+    body { font-family: sans-serif; max-width: 800px; margin: auto; padding: 20px; background: #f4f4f4; }
+    h1 { text-align: center; color: #2c3e50; }
+    .question { background: #fff; padding: 15px; margin: 15px 0; border-left: 4px solid #3498db; border-radius: 4px; }
+    label { display: block; margin: 5px 0; }
+    #timer { font-size: 20px; font-weight: bold; color: #e74c3c; text-align: center; margin-bottom: 20px; }
+    button { padding: 10px 20px; background: #3498db; color: #fff; border: none; border-radius: 5px; cursor: pointer; }
+    .section-heading {
+      background: #fff8e1;
+      border-left: 5px solid #ffc107;
+      padding: 10px;
+      font-size: 18px;
+      margin-top: 30px;
+      margin-bottom: 10px;
+      color: #333;
+      font-weight: bold;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Advanced Quiz</h1>
+  <div id="timer">Loading timer...</div>
+
+  <form id="quizForm">
+
+    <!-- Section: Maths -->
+    <div class="section-heading">👉 Now Starting: Mathematics Section</div>
+
+    <div class="question">
+      <p>1. What is 15 + 27?</p>
+      <label><input type="radio" name="q1" value="a">32</label>
+      <label><input type="radio" name="q1" value="b">42</label>
+      <label><input type="radio" name="q1" value="c">52</label>
+      <label><input type="radio" name="q1" value="d">62</label>
+    </div>
+
+    <div class="question">
+      <p>2. What is 8 × 9?</p>
+      <label><input type="radio" name="q2" value="a">72</label>
+      <label><input type="radio" name="q2" value="b">81</label>
+      <label><input type="radio" name="q2" value="c">63</label>
+      <label><input type="radio" name="q2" value="d">56</label>
+    </div>
+
+    <!-- Section: Science -->
+    <div class="section-heading">👉 Now Starting: Science Section</div>
+
+    <div class="question">
+      <p>31. Which planet is known as the Red Planet?</p>
+      <label><input type="radio" name="q31" value="a">Venus</label>
+      <label><input type="radio" name="q31" value="b">Mars</label>
+      <label><input type="radio" name="q31" value="c">Jupiter</label>
+      <label><input type="radio" name="q31" value="d">Saturn</label>
+    </div>
+
+    <div class="question">
+      <p>32. What is H₂O?</p>
+      <label><input type="radio" name="q32" value="a">CO₂</label>
+      <label><input type="radio" name="q32" value="b">Water</label>
+      <label><input type="radio" name="q32" value="c">Salt</label>
+      <label><input type="radio" name="q32" value="d">Oxygen</label>
+    </div>
+
+    <!-- Section: GK -->
+    <div class="section-heading">👉 Now Starting: General Knowledge Section</div>
+
+    <div class="question">
+      <p>61. Who wrote 'Romeo and Juliet'?</p>
+      <label><input type="radio" name="q61" value="a">Dickens</label>
+      <label><input type="radio" name="q61" value="b">Shakespeare</label>
+      <label><input type="radio" name="q61" value="c">Austen</label>
+      <label><input type="radio" name="q61" value="d">Twain</label>
+    </div>
+
+    <div class="question">
+      <p>62. Capital of France?</p>
+      <label><input type="radio" name="q62" value="a">London</label>
+      <label><input type="radio" name="q62" value="b">Berlin</label>
+      <label><input type="radio" name="q62" value="c">Paris</label>
+      <label><input type="radio" name="q62" value="d">Madrid</label>
+    </div>
+
+    <button type="button" onclick="submitQuiz()">Submit Quiz</button>
+  </form>
+
+  <script>
+    const correctAnswers = {
+      q1: "b", q2: "a",
+      q31: "b", q32: "b",
+      q61: "b", q62: "c"
+    };
+
+    const sections = {
+      "Mathematics Section": ["q1", "q2"],
+      "Science Section": ["q31", "q32"],
+      "General Knowledge Section": ["q61", "q62"]
+    };
+
+    let timeLeft = 7200;
+    const timer = document.getElementById("timer");
+    const interval = setInterval(() => {
+      if (timeLeft <= 0) {
+        clearInterval(interval);
+        submitQuiz();
+        return;
+      }
+      const h = String(Math.floor(timeLeft / 3600)).padStart(2, '0');
+      const m = String(Math.floor((timeLeft % 3600) / 60)).padStart(2, '0');
+      const s = String(timeLeft % 60).padStart(2, '0');
+      timer.textContent = `Time Left: ${h}:${m}:${s}`;
+      timeLeft--;
+    }, 1000);
+
+    function submitQuiz() {
+      clearInterval(interval);
+      const form = document.getElementById("quizForm");
+      let totalScore = 0;
+      const result = {};
+
+      for (let section in sections) {
+        let correct = 0, incorrect = 0, unattempted = 0;
+
+        sections[section].forEach(q => {
+          const selected = form.querySelector(`input[name="${q}"]:checked`);
+          if (!selected) {
+            unattempted++;
+          } else if (selected.value === correctAnswers[q]) {
+            correct++;
+            totalScore += 1;
+          } else {
+            incorrect++;
+            totalScore -= 0.33;
+          }
+        });
+
+        result[section] = {
+          correct, incorrect, unattempted,
+          score: Math.max(0, correct - incorrect * 0.33).toFixed(2)
+        };
+      }
+
+      // ✅ Disable all inputs after submit
+      const allInputs = form.querySelectorAll('input[type="radio"]');
+      allInputs.forEach(input => {
+        input.disabled = true;
+      });
+
+      // ✅ Disable submit button
+      form.querySelector("button").disabled = true;
+
+      // ✅ Show results in new window
+      const newWin = window.open("", "_blank");
+      newWin.document.write(`
+        <html>
+          <head>
+            <title>Result</title>
+            <style>
+              body { font-family: sans-serif; padding: 20px; }
+              h1 { color: #2c3e50; }
+              .section { margin-bottom: 15px; padding: 10px; background: #f8f9fa; border-left: 4px solid #3498db; }
+              .total { font-size: 20px; font-weight: bold; color: #27ae60; }
+              button { margin-top: 20px; padding: 10px 15px; background: #3498db; color: #fff; border: none; border-radius: 4px; }
+            </style>
+          </head>
+          <body>
+            <h1>Your Score Card</h1>
+            ${Object.keys(result).map(sec => `
+              <div class="section">
+                <h3>${sec}</h3>
+                <p>✅ Correct: ${result[sec].correct}</p>
+                <p>❌ Incorrect: ${result[sec].incorrect}</p>
+                <p>⚪ Unattempted: ${result[sec].unattempted}</p>
+                <p>📊 Score: ${result[sec].score}</p>
+              </div>
+            `).join("")}
+            <div class="total">🏁 Total Score: ${Math.max(0, totalScore).toFixed(2)}</div>
+            <button onclick="window.print()">🖨️ Print Result</button>
+          </body>
+        </html>
+      `);
+      newWin.document.close();
+    }
+  </script>
+</body>
+</html>
