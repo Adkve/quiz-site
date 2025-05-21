@@ -1,0 +1,116 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>MCQ Test - 2 Hour Timer</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    .question {
+      margin-bottom: 20px;
+    }
+    .timer {
+      font-size: 24px;
+      font-weight: bold;
+      color: red;
+      margin-bottom: 20px;
+    }
+    .result {
+      font-size: 20px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>MCQ Test (2 Hours)</h1>
+  <div class="timer" id="timer">Time left: 02:00:00</div>
+  <form id="quizForm">
+    <div class="question">
+      <p>1. What is the capital of France?</p>
+      <input type="radio" name="q1" value="a"> a) Berlin<br>
+      <input type="radio" name="q1" value="b"> b) Madrid<br>
+      <input type="radio" name="q1" value="c"> c) Paris<br>
+      <input type="radio" name="q1" value="d"> d) Rome<br>
+    </div>
+    <div class="question">
+      <p>2. Which is the largest planet in our solar system?</p>
+      <input type="radio" name="q2" value="a"> a) Earth<br>
+      <input type="radio" name="q2" value="b"> b) Jupiter<br>
+      <input type="radio" name="q2" value="c"> c) Mars<br>
+      <input type="radio" name="q2" value="d"> d) Venus<br>
+    </div>
+    <div class="question">
+      <p>3. Who wrote 'Hamlet'?</p>
+      <input type="radio" name="q3" value="a"> a) Charles Dickens<br>
+      <input type="radio" name="q3" value="b"> b) Jane Austen<br>
+      <input type="radio" name="q3" value="c"> c) William Shakespeare<br>
+      <input type="radio" name="q3" value="d"> d) Mark Twain<br>
+    </div>
+    <div class="question">
+      <p>4. Which element has the chemical symbol O?</p>
+      <input type="radio" name="q4" value="a"> a) Oxygen<br>
+      <input type="radio" name="q4" value="b"> b) Gold<br>
+      <input type="radio" name="q4" value="c"> c) Silver<br>
+      <input type="radio" name="q4" value="d"> d) Iron<br>
+    </div>
+    <div class="question">
+      <p>5. What is the square root of 64?</p>
+      <input type="radio" name="q5" value="a"> a) 6<br>
+      <input type="radio" name="q5" value="b"> b) 7<br>
+      <input type="radio" name="q5" value="c"> c) 8<br>
+      <input type="radio" name="q5" value="d"> d) 9<br>
+    </div>
+    <button type="submit">Submit</button>
+  </form>
+
+  <div class="result" id="result"></div>
+
+  <script>
+    const correctAnswers = {
+      q1: "c",
+      q2: "b",
+      q3: "c",
+      q4: "a",
+      q5: "c"
+    };
+
+    document.getElementById("quizForm").onsubmit = function(event) {
+      event.preventDefault();
+      let score = 0;
+      for (let q in correctAnswers) {
+        const selected = document.querySelector(`input[name="${q}"]:checked`);
+        if (selected) {
+          if (selected.value === correctAnswers[q]) {
+            score += 1;
+          } else {
+            score += 0.33;
+          }
+        }
+      }
+      document.getElementById("result").innerText = "Your Score: " + score.toFixed(2);
+    };
+
+    // Timer Logic
+    let totalSeconds = 2 * 60 * 60;
+    const timerDisplay = document.getElementById("timer");
+
+    function updateTimer() {
+      const hours = String(Math.floor(totalSeconds / 3600)).padStart(2, '0');
+      const minutes = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, '0');
+      const seconds = String(totalSeconds % 60).padStart(2, '0');
+      timerDisplay.textContent = `Time left: ${hours}:${minutes}:${seconds}`;
+      if (totalSeconds <= 0) {
+        clearInterval(timerInterval);
+        document.getElementById("quizForm").submit();
+      }
+      totalSeconds--;
+    }
+
+    const timerInterval = setInterval(updateTimer, 1000);
+    updateTimer();
+  </script>
+</body>
+</html>
