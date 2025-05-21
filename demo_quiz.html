@@ -2,115 +2,477 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>MCQ Test - 2 Hour Timer</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 20px;
-    }
-    .question {
-      margin-bottom: 20px;
-    }
-    .timer {
-      font-size: 24px;
-      font-weight: bold;
-      color: red;
-      margin-bottom: 20px;
-    }
-    .result {
-      font-size: 20px;
-      font-weight: bold;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Online Quiz</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            color: #2c3e50;
+            background-color: #f9f9f9;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #3498db;
+        }
+        .timer-container {
+            background: #2c3e50;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 50px;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .timer-progress {
+            width: 100px;
+            height: 100px;
+            margin-right: 15px;
+            position: relative;
+        }
+        .timer-circle {
+            width: 100%;
+            height: 100%;
+            transform: rotate(-90deg);
+        }
+        .timer-circle-bg {
+            fill: none;
+            stroke: #34495e;
+            stroke-width: 8;
+        }
+        .timer-circle-fill {
+            fill: none;
+            stroke: #e74c3c;
+            stroke-width: 8;
+            stroke-linecap: round;
+            stroke-dasharray: 283;
+            stroke-dashoffset: 283;
+            transition: stroke-dashoffset 1s linear;
+        }
+        .timer-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .section {
+            background-color: white;
+            padding: 20px;
+            margin-bottom: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            border-left: 5px solid #3498db;
+        }
+        .section h2 {
+            margin-top: 0;
+            color: #2c3e50;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+        .question {
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #f8fafc;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+        .question:hover {
+            background-color: #f0f7ff;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .options label {
+            display: block;
+            margin: 8px 0;
+            padding: 10px;
+            background-color: white;
+            border-radius: 4px;
+            cursor: pointer;
+            border: 1px solid #ddd;
+            transition: all 0.2s;
+        }
+        .options label:hover {
+            border-color: #3498db;
+            background-color: #f0f7ff;
+        }
+        .options input[type="radio"] {
+            margin-right: 10px;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            font-size: 16px;
+            border-radius: 50px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        button:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0,0,0,0.15);
+        }
+        button:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        .hidden {
+            display: none;
+        }
+        .warning {
+            color: #e74c3c;
+            font-weight: bold;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.6; }
+            100% { opacity: 1; }
+        }
+    </style>
 </head>
 <body>
-  <h1>MCQ Test (2 Hours)</h1>
-  <div class="timer" id="timer">Time left: 02:00:00</div>
-  <form id="quizForm">
-    <div class="question">
-      <p>1. What is the capital of France?</p>
-      <input type="radio" name="q1" value="a"> a) Berlin<br>
-      <input type="radio" name="q1" value="b"> b) Madrid<br>
-      <input type="radio" name="q1" value="c"> c) Paris<br>
-      <input type="radio" name="q1" value="d"> d) Rome<br>
+    <div class="header">
+        <h1>Advanced Online Quiz</h1>
+        <div class="timer-container">
+            <div class="timer-progress">
+                <svg class="timer-circle" viewBox="0 0 100 100">
+                    <circle class="timer-circle-bg" cx="50" cy="50" r="45"/>
+                    <circle class="timer-circle-fill" cx="50" cy="50" r="45"/>
+                </svg>
+                <div class="timer-text" id="timer">02:00:00</div>
+            </div>
+            <div>Time Remaining</div>
+        </div>
     </div>
-    <div class="question">
-      <p>2. Which is the largest planet in our solar system?</p>
-      <input type="radio" name="q2" value="a"> a) Earth<br>
-      <input type="radio" name="q2" value="b"> b) Jupiter<br>
-      <input type="radio" name="q2" value="c"> c) Mars<br>
-      <input type="radio" name="q2" value="d"> d) Venus<br>
-    </div>
-    <div class="question">
-      <p>3. Who wrote 'Hamlet'?</p>
-      <input type="radio" name="q3" value="a"> a) Charles Dickens<br>
-      <input type="radio" name="q3" value="b"> b) Jane Austen<br>
-      <input type="radio" name="q3" value="c"> c) William Shakespeare<br>
-      <input type="radio" name="q3" value="d"> d) Mark Twain<br>
-    </div>
-    <div class="question">
-      <p>4. Which element has the chemical symbol O?</p>
-      <input type="radio" name="q4" value="a"> a) Oxygen<br>
-      <input type="radio" name="q4" value="b"> b) Gold<br>
-      <input type="radio" name="q4" value="c"> c) Silver<br>
-      <input type="radio" name="q4" value="d"> d) Iron<br>
-    </div>
-    <div class="question">
-      <p>5. What is the square root of 64?</p>
-      <input type="radio" name="q5" value="a"> a) 6<br>
-      <input type="radio" name="q5" value="b"> b) 7<br>
-      <input type="radio" name="q5" value="c"> c) 8<br>
-      <input type="radio" name="q5" value="d"> d) 9<br>
-    </div>
-    <button type="submit">Submit</button>
-  </form>
 
-  <div class="result" id="result"></div>
+    <p style="background: #fff8e1; padding: 10px; border-radius: 4px; border-left: 4px solid #ffc107;">
+        <strong>Scoring:</strong> Correct answer: +1 point | Wrong answer: -0.33 points
+    </p>
+    
+    <form id="quizForm">
+        <!-- Section 1 -->
+        <div class="section" id="section1">
+            <h2>Section 1: Mathematics (30 Questions)</h2>
+            <div id="math-questions">
+                <!-- Question 1 -->
+                <div class="question">
+                    <p>1. What is 15 + 27?</p>
+                    <div class="options">
+                        <label><input type="radio" name="q1" value="a"> 32</label>
+                        <label><input type="radio" name="q1" value="b"> 42</label>
+                        <label><input type="radio" name="q1" value="c"> 52</label>
+                        <label><input type="radio" name="q1" value="d"> 62</label>
+                    </div>
+                </div>
+                
+                <!-- Question 2 -->
+                <div class="question">
+                    <p>2. What is 8 × 9?</p>
+                    <div class="options">
+                        <label><input type="radio" name="q2" value="a"> 72</label>
+                        <label><input type="radio" name="q2" value="b"> 81</label>
+                        <label><input type="radio" name="q2" value="c"> 63</label>
+                        <label><input type="radio" name="q2" value="d"> 56</label>
+                    </div>
+                </div>
+                
+                <!-- More questions would go here -->
+            </div>
+        </div>
+        
+        <!-- Section 2 -->
+        <div class="section" id="section2">
+            <h2>Section 2: Science (30 Questions)</h2>
+            <div id="science-questions">
+                <!-- Question 31 -->
+                <div class="question">
+                    <p>31. Which planet is known as the Red Planet?</p>
+                    <div class="options">
+                        <label><input type="radio" name="q31" value="a"> Venus</label>
+                        <label><input type="radio" name="q31" value="b"> Mars</label>
+                        <label><input type="radio" name="q31" value="c"> Jupiter</label>
+                        <label><input type="radio" name="q31" value="d"> Saturn</label>
+                    </div>
+                </div>
+                
+                <!-- Question 32 -->
+                <div class="question">
+                    <p>32. What is H₂O?</p>
+                    <div class="options">
+                        <label><input type="radio" name="q32" value="a"> Carbon Dioxide</label>
+                        <label><input type="radio" name="q32" value="b"> Water</label>
+                        <label><input type="radio" name="q32" value="c"> Salt</label>
+                        <label><input type="radio" name="q32" value="d"> Oxygen</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Section 3 -->
+        <div class="section" id="section3">
+            <h2>Section 3: General Knowledge (30 Questions)</h2>
+            <div id="gk-questions">
+                <!-- Question 61 -->
+                <div class="question">
+                    <p>61. Who wrote 'Romeo and Juliet'?</p>
+                    <div class="options">
+                        <label><input type="radio" name="q61" value="a"> Charles Dickens</label>
+                        <label><input type="radio" name="q61" value="b"> William Shakespeare</label>
+                        <label><input type="radio" name="q61" value="c"> Jane Austen</label>
+                        <label><input type="radio" name="q61" value="d"> Mark Twain</label>
+                    </div>
+                </div>
+                
+                <!-- Question 62 -->
+                <div class="question">
+                    <p>62. What is the capital of France?</p>
+                    <div class="options">
+                        <label><input type="radio" name="q62" value="a"> London</label>
+                        <label><input type="radio" name="q62" value="b"> Berlin</label>
+                        <label><input type="radio" name="q62" value="c"> Paris</label>
+                        <label><input type="radio" name="q62" value="d"> Madrid</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <button type="button" id="submitBtn">Submit Quiz</button>
+        <button type="button" id="saveBtn" style="background-color: #2ecc71; margin-left: 10px;">Save Progress</button>
+    </form>
 
-  <script>
-    const correctAnswers = {
-      q1: "c",
-      q2: "b",
-      q3: "c",
-      q4: "a",
-      q5: "c"
-    };
+    <div id="timeUpWarning" class="hidden warning" style="text-align: center; padding: 20px; font-size: 24px;">
+        Your time is up! The quiz will be submitted automatically.
+    </div>
 
-    document.getElementById("quizForm").onsubmit = function(event) {
-      event.preventDefault();
-      let score = 0;
-      for (let q in correctAnswers) {
-        const selected = document.querySelector(`input[name="${q}"]:checked`);
-        if (selected) {
-          if (selected.value === correctAnswers[q]) {
-            score += 1;
-          } else {
-            score += 0.33;
-          }
+    <script>
+        // Correct answers (fill with all 90 correct answers)
+        const correctAnswers = {
+            q1: "b", q2: "a", q31: "b", q32: "b", q61: "b", q62: "c"
+            // Add all correct answers here
+        };
+        
+        // Section ranges
+        const sections = [
+            { id: "section1", name: "Mathematics", start: 1, end: 30 },
+            { id: "section2", name: "Science", start: 31, end: 60 },
+            { id: "section3", name: "General Knowledge", start: 61, end: 90 }
+        ];
+        
+        // Timer functionality
+        const totalTime = 2 * 60 * 60; // 2 hours in seconds
+        let timeLeft = totalTime;
+        let timerInterval;
+        
+        // Circular progress bar elements
+        const circleFill = document.querySelector('.timer-circle-fill');
+        const timerText = document.getElementById('timer');
+        
+        // Initialize timer
+        function startTimer() {
+            updateTimerDisplay();
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                updateTimerDisplay();
+                
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    timeUp();
+                }
+            }, 1000);
         }
-      }
-      document.getElementById("result").innerText = "Your Score: " + score.toFixed(2);
-    };
-
-    // Timer Logic
-    let totalSeconds = 2 * 60 * 60;
-    const timerDisplay = document.getElementById("timer");
-
-    function updateTimer() {
-      const hours = String(Math.floor(totalSeconds / 3600)).padStart(2, '0');
-      const minutes = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, '0');
-      const seconds = String(totalSeconds % 60).padStart(2, '0');
-      timerDisplay.textContent = `Time left: ${hours}:${minutes}:${seconds}`;
-      if (totalSeconds <= 0) {
-        clearInterval(timerInterval);
-        document.getElementById("quizForm").submit();
-      }
-      totalSeconds--;
-    }
-
-    const timerInterval = setInterval(updateTimer, 1000);
-    updateTimer();
-  </script>
+        
+        function updateTimerDisplay() {
+            const hours = Math.floor(timeLeft / 3600);
+            const minutes = Math.floor((timeLeft % 3600) / 60);
+            const seconds = timeLeft % 60;
+            
+            timerText.textContent = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+            
+            // Update progress circle
+            const circumference = 283;
+            const offset = circumference - (timeLeft / totalTime) * circumference;
+            circleFill.style.strokeDashoffset = offset;
+            
+            // Change color when time is running low
+            if (timeLeft <= 300) { // 5 minutes left
+                circleFill.style.stroke = '#e74c3c';
+                timerText.style.color = '#e74c3c';
+            } else if (timeLeft <= 900) { // 15 minutes left
+                circleFill.style.stroke = '#f39c12';
+                timerText.style.color = '#f39c12';
+            }
+        }
+        
+        function timeUp() {
+            document.getElementById('timeUpWarning').classList.remove('hidden');
+            setTimeout(() => {
+                submitQuiz();
+            }, 3000);
+        }
+        
+        function submitQuiz() {
+            // Disable all inputs
+            const allInputs = document.querySelectorAll('input[type="radio"]');
+            allInputs.forEach(input => input.disabled = true);
+            
+            // Disable buttons
+            document.getElementById('submitBtn').disabled = true;
+            document.getElementById('saveBtn').disabled = true;
+            
+            // Calculate scores
+            let totalScore = 0;
+            let sectionScores = {};
+            let responses = {};
+            
+            // Initialize section scores
+            sections.forEach(section => {
+                sectionScores[section.id] = 0;
+            });
+            
+            // Check each question
+            for (let i = 1; i <= 90; i++) {
+                const questionName = "q" + i;
+                const selectedOption = document.querySelector(`input[name="${questionName}"]:checked`);
+                
+                if (selectedOption) {
+                    // Store response
+                    responses[questionName] = selectedOption.value;
+                    
+                    // Find which section this question belongs to
+                    const section = sections.find(s => i >= s.start && i <= s.end);
+                    
+                    if (selectedOption.value === correctAnswers[questionName]) {
+                        // Correct answer: +1 point
+                        totalScore += 1;
+                        sectionScores[section.id] += 1;
+                    } else {
+                        // Wrong answer: -0.33 points
+                        totalScore -= 0.33;
+                        sectionScores[section.id] -= 0.33;
+                    }
+                }
+            }
+            
+            // Generate score card in new window
+            const scoreCard = generateScoreCard(totalScore, sectionScores, responses);
+            const newWindow = window.open('', '_blank');
+            newWindow.document.write(scoreCard);
+            newWindow.document.close();
+            
+            // Prevent going back
+            window.location.replace('about:blank');
+        }
+        
+        function generateScoreCard(totalScore, sectionScores, responses) {
+            // Ensure score isn't negative
+            const finalScore = Math.max(0, totalScore).toFixed(2);
+            
+            return `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Quiz Results</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; padding: 20px; }
+                        h1 { color: #2c3e50; }
+                        .section-score { margin: 15px 0; padding: 10px; background: #f8f9fa; }
+                        .final-score { font-size: 24px; font-weight: bold; margin: 20px 0; }
+                        .print-btn { padding: 10px 15px; background: #3498db; color: white; border: none; cursor: pointer; }
+                    </style>
+                </head>
+                <body>
+                    <h1>Quiz Results</h1>
+                    <p>Submitted on: ${new Date().toLocaleString()}</p>
+                    
+                    ${sections.map(section => `
+                        <div class="section-score">
+                            <h3>${section.name}</h3>
+                            <p>Score: ${Math.max(0, sectionScores[section.id]).toFixed(2)}/${section.end - section.start + 1}</p>
+                        </div>
+                    `).join('')}
+                    
+                    <div class="final-score">
+                        Total Score: ${finalScore}/90
+                    </div>
+                    
+                    <button class="print-btn" onclick="window.print()">Print Results</button>
+                    
+                    <script>
+                        // Disable back button
+                        history.pushState(null, null, location.href);
+                        window.onpopstate = function() {
+                            history.go(1);
+                        };
+                        
+                        // Prevent context menu
+                        document.addEventListener('contextmenu', function(e) {
+                            e.preventDefault();
+                        });
+                    </script>
+                </body>
+                </html>
+            `;
+        }
+        
+        // Save progress to localStorage
+        function saveProgress() {
+            const responses = {};
+            for (let i = 1; i <= 90; i++) {
+                const questionName = "q" + i;
+                const selectedOption = document.querySelector(`input[name="${questionName}"]:checked`);
+                if (selectedOption) {
+                    responses[questionName] = selectedOption.value;
+                }
+            }
+            localStorage.setItem('quizProgress', JSON.stringify(responses));
+            localStorage.setItem('quizTimeLeft', timeLeft);
+            
+            alert('Progress saved! You can continue later.');
+        }
+        
+        // Load saved progress
+        function loadProgress() {
+            const savedProgress = localStorage.getItem('quizProgress');
+            const savedTime = localStorage.getItem('quizTimeLeft');
+            
+            if (savedProgress) {
+                const responses = JSON.parse(savedProgress);
+                for (const question in responses) {
+                    const option = document.querySelector(`input[name="${question}"][value="${responses[question]}"]`);
+                    if (option) option.checked = true;
+                }
+            }
+            
+            if (savedTime) {
+                timeLeft = parseInt(savedTime);
+                updateTimerDisplay();
+            }
+        }
+        
+        // Event listeners
+        document.getElementById('submitBtn').addEventListener('click', submitQuiz);
+        document.getElementById('saveBtn').addEventListener('click', saveProgress);
+        
+        // Start timer and load progress when page loads
+        window.addEventListener('load', () => {
+            startTimer();
+            loadProgress();
+        });
+    </script>
 </body>
-</html>
+</html>   
